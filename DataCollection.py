@@ -217,7 +217,7 @@ class Data_Collection:
                 cursor.execute(statement2)
 
         # --------------Creates mySQL Connection------------------------------------------------------------------------
-        conn = mysql.connector.connect(user='root', password='password', host='127.0.0.1', database='ItemFile',
+        conn = mysql.connector.connect(user='root', password='password', host='127.0.0.1', database='reportsystem',
                                        allow_local_infile=True)
         cursor = conn.cursor()
         print("Connected to MySQL...")
