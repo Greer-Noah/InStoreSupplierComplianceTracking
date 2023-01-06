@@ -1,0 +1,8 @@
+mysql==0.0.3
+mysql-connector-python==8.0.31
+future==0.18.2
+pandas==1.5.1
+pyepc==0.0.3
+XlsxWriter==3.0.3
+PyMySQL==1.0.2
+SQLAlchemy==1.4.42
