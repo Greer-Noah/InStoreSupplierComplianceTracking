@@ -8,13 +8,14 @@ from tkinter import ttk
 from tkinter import filedialog
 import os
 import pandas as pd
-import tkdnd
+# import tkdnd
+import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 import InterfaceCreation
 
 
-interface = InterfaceCreation.Interface_Creation(tkdnd.Tk(), 800, 650)
+interface = InterfaceCreation.Interface_Creation(tkinterDnD.Tk(), 800, 650)
 interface.creation()
 # print(interface.store_list)
 
@@ -31,6 +32,10 @@ combined_matching_sheet_name = "Combined Matching"
 str(combined_matching_sheet_name)
 interface.store_list[-1].get_combined().to_excel(writer, combined_matching_sheet_name, startrow=0, startcol=0, index=False)
 
+combined_repl_sheet_name = "REPL_NBR_Breakdown Total"
+str(combined_repl_sheet_name)
+interface.store_list[-1].get_combined_repl().to_excel(writer, combined_repl_sheet_name, startrow=0, startcol=0, index=False)
+
 for store in interface.store_list:
     matching_sheet_name = "Matching {}".format(store.store_num)
     str(matching_sheet_name)
@@ -38,10 +43,13 @@ for store in interface.store_list:
     str(total_items_sheet_name)
     expected_items_sheet_name = "Expected Items {}".format(store.store_num)
     str(expected_items_sheet_name)
+    repl_group_nbr_sheet_name = "REPL Breakdown {}".format(store.store_num)
+    str(repl_group_nbr_sheet_name)
 
     store.get_matching().to_excel(writer, matching_sheet_name, startrow=0, startcol=0, index=False)
     store.get_total_items().to_excel(writer, total_items_sheet_name, startrow=0, startcol=0, index=False)
     store.get_expected().to_excel(writer, expected_items_sheet_name, startrow=0, startcol=0, index=False)
+    store.get_repl_nbr().to_excel(writer, repl_group_nbr_sheet_name, startrow=0, startcol=0, index=False)
 
 
 writer.save()

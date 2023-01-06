@@ -9,7 +9,8 @@ from tkinter.ttk import Progressbar
 from tkinter import filedialog
 import os
 import pandas as pd
-import tkdnd
+# import tkdnd
+import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 import DataCollection
@@ -24,13 +25,13 @@ class Interface_Creation:
         self.store_list = []
         self.store_num = None
         self.date_input = None
-        self.store = Store.Store(None, None, None, None, None, None, None, None, None)
+        self.store = Store.Store(None, None, None, None, None, None, None, None, None, None, None)
         self.folder_created = False
 
 
     def reset(self):
         self.store_list.append(self.store)
-        self.store = Store.Store(None, None, None, None, None, None, None, None, None)
+        self.store = Store.Store(None, None, None, None, None, None, None, None, None, None, None)
         entry.destroy()
         label.destroy()
         label1.destroy()

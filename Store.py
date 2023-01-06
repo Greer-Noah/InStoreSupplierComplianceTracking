@@ -8,13 +8,14 @@ from tkinter import ttk
 from tkinter import filedialog
 import os
 import pandas as pd
-import tkdnd
+# import tkdnd
+import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 
 
 class Store:
-    def __init__(self, store_num, date_input, cycle, cycle_output, item_file, matching, total_items, expected, combined):
+    def __init__(self, store_num, date_input, cycle, cycle_output, item_file, matching, total_items, repl_nbr, expected, combined, combined_repl):
         self.store_num = store_num
         self.date_input = date_input
         self.cycle = cycle
@@ -22,8 +23,10 @@ class Store:
         self.item_file = item_file
         self.matching = matching
         self.total_items = total_items
+        self.repl_nbr = repl_nbr
         self.expected = expected
         self.combined = combined
+        self.combined_repl = combined_repl
 
     def set_cycle(self, cycle_path):
         self.cycle = cycle_path
@@ -40,11 +43,17 @@ class Store:
     def set_total_items(self, total_items_df):
         self.total_items = total_items_df
 
+    def set_repl_nbr(self, repl_nbr):
+        self.repl_nbr = repl_nbr
+
     def set_expected(self, expected_df):
         self.expected = expected_df
 
     def set_combined(self, combined):
         self.combined = combined
+
+    def set_combined_repl(self, combined_repl):
+        self.combined_repl = combined_repl
 
     def set_store_num(self, store_number):
         self.store_num = store_number
@@ -67,11 +76,17 @@ class Store:
     def get_total_items(self):
         return self.total_items
 
+    def get_repl_nbr(self):
+        return self.repl_nbr
+
     def get_expected(self):
         return self.expected
 
     def get_combined(self):
         return self.combined
+
+    def get_combined_repl(self):
+        return self.combined_repl
 
     def get_store_num(self):
         return self.store_num

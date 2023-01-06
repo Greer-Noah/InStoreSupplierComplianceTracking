@@ -10,7 +10,8 @@ import xlsxwriter
 from tkinter import filedialog
 import os
 import pandas as pd
-import tkdnd
+# import tkdnd
+import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 from sqlalchemy import create_engine
@@ -24,7 +25,7 @@ class Data_Collection:
     def __init__(self, store_num, date_input, root, interface_creation):
         self.store_num = store_num
         self.date_input = date_input
-        self.store = Store.Store(self.store_num, self.date_input, None, None, None, None, None, None, None)
+        self.store = Store.Store(self.store_num, self.date_input, None, None, None, None, None, None, None, None, None)
         self.root = root
         self.interface_creation = interface_creation
 
@@ -221,6 +222,8 @@ class Data_Collection:
                                        allow_local_infile=True)
         cursor = conn.cursor()
         print("Connected to MySQL...")
+        stmt00 = "SET GLOBAL local_infile=1;"
+        cursor.execute(stmt00)
 
         # --------------Waits for Item File selection-------------------------------------------------------------------
         var = tk.IntVar()
@@ -410,6 +413,26 @@ class Data_Collection:
         stmt27 = "INSERT INTO OHData_Dept_Sums SELECT * FROM OHData_Dept_Sums " \
                  "UNION SELECT 0 dept_nbr, SUM(ei_onhand_qty) FROM OHData_Dept_Sums;"
         cursor.execute(stmt27)
+        stmt28 = "SET SQL_SAFE_UPDATES = 0;"
+        cursor.execute(stmt28)
+        stmt29 = "DELETE FROM OHData_Dept_Sums LIMIT 10;"
+        cursor.execute(stmt29)
+        stmt30 = "SET SQL_SAFE_UPDATES = 1;"
+        cursor.execute(stmt30)
+
+        # --------------Creates REPL_GROUP_NBR_BREAKDOWN table------------------------------------------------------------
+        print("Creating REPL_GROUP_NBR_BREAKDOWN Table...")
+        stmt31 = "DROP TABLE IF EXISTS REPL_GROUP_NBR_BREAKDOWN;"
+        cursor.execute(stmt31)
+        stmt32 = "CREATE TABLE REPL_GROUP_NBR_BREAKDOWN (id INT NOT NULL primary key auto_increment, " \
+                 "REPL_GROUP_NBR BIGINT NOT NULL);"
+        cursor.execute(stmt32)
+        stmt33 = "INSERT INTO repl_group_nbr_breakdown (repl_group_nbr) " \
+                 "SELECT DISTINCT itemfile.REPL_GROUP_NBR FROM itemfile " \
+                 "WHERE dept_nbr IN ('7','9','14','17','20','22','71','72','74','87');"
+        cursor.execute(stmt33)
+
+
 
         # --------------Exports Weekly Report with Matching, Total Items, and Expected Items tables-------------------------
         match_file_name = "WeeklyReport{1}.xlsx".format(self.store_num, self.date_input)
@@ -444,6 +467,14 @@ class Data_Collection:
         str(onhand_data_sums_sheet_name)
         # df12.to_excel(writer, sheet_name=onhand_data_sums_sheet_name, startrow=0, startcol=0, index=False)
 
+        # print("Exporting REPL_GROUP_NBR_Breakdown File to .xlsx...")
+        print("Exporting REPL_GROUP_NBR_Breakdown")
+        df13 = sql.read_sql('SELECT repl_group_nbr FROM REPL_GROUP_NBR_Breakdown', conn)
+        self.interface_creation.store.set_repl_nbr(df13)
+        repl_group_nbr_sheet_name = "REPL Breakdown {}".format(self.store_num)
+        str(repl_group_nbr_sheet_name)
+        # df11.to_excel(writer, sheet_name=total_items_sheet_name, startrow=0, startcol=0, index=False)
+
         # writer.save()
 
         # --------------Closes mySQL Connection-----------------------------------------------------------------------------
@@ -458,13 +489,13 @@ class Data_Collection:
         pw = ''
         host = 'localhost'
         port = 3306
-        db = 'ItemFile'
+        db = 'reportsystem'
 
         db_data = 'mysql+mysqldb://' + 'root' + ':' + 'password' + '@' + '127.0.0.1' + ':3306/' \
-                  + 'ItemFile' + '?charset=latin1'
+                  + 'reportsystem' + '?charset=latin1'
         engine = create_engine(db_data)
 
-        connection = mysql.connector.connect(user='root', password='password', host='127.0.0.1', database='ItemFile',
+        connection = mysql.connector.connect(user='root', password='password', host='127.0.0.1', database='reportsystem',
                                              allow_local_infile=True)
 
         cursor = connection.cursor(buffered=True)
@@ -484,17 +515,38 @@ class Data_Collection:
                 "MAX(VENDOR_NBR) AS VENDOR_NBR, " \
                 "MAX(VENDOR_NAME) AS VENDOR_NAME, " \
                 "MAX(BRAND_FAMILY_NAME) AS BRAND_FAMILY_NAME, " \
-                "MAX(dept_nbr)AS dept_nbr, " \
+                "MAX(dept_nbr) AS dept_nbr, " \
                 "MAX(REPL_GROUP_NBR) AS REPL_GROUP_NBR " \
                 "FROM CombinedMatching_Dupes GROUP BY gtin;"
         cursor.execute(stmt1)
 
         cursor.execute("DROP TABLE IF EXISTS CombinedMatching_Dupes;")
 
+        stmt2 = "DROP TABLE IF EXISTS CombinedREPL_Dupes;"
+        cursor.execute(stmt2)
+        stmt3 = "CREATE TABLE CombinedREPL_Dupes (id INT NOT NULL primary key auto_increment, " \
+                 "REPL_GROUP_NBR BIGINT NOT NULL);"
+        cursor.execute(stmt3)
+
+        cursor.execute("DROP TABLE IF EXISTS CombinedREPL;")
+
+        for store in store_list:
+            store.get_repl_nbr().to_sql('CombinedREPL_Dupes', con=engine, if_exists='append', index=False)
+
+        stmt4 = "CREATE TABLE CombinedREPL AS SELECT DISTINCT repl_group_nbr FROM CombinedREPL_Dupes"
+        cursor.execute(stmt4)
+
+        cursor.execute("DROP TABLE IF EXISTS CombinedREPL_Dupes")
+
+
         print("Gathering Combined Matching...")
-        df13 = sql.read_sql('SELECT * FROM CombinedMatching', connection)
-        self.interface_creation.store.set_combined(df13)
+        df14 = sql.read_sql('SELECT * FROM CombinedMatching', connection)
+        self.interface_creation.store.set_combined(df14)
+        print("Gathering Combined REPL...")
+        df15 = sql.read_sql('SELECT * FROM CombinedREPL', connection)
+        self.interface_creation.store.set_combined_repl(df15)
 
         engine.dispose()
         connection.close()
+
 
