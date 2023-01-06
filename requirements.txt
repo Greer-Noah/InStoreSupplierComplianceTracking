@@ -6,3 +6,4 @@ pyepc==0.0.3
 XlsxWriter==3.0.3
 PyMySQL==1.0.2
 SQLAlchemy==1.4.42
+openpyxl==3.0.10
