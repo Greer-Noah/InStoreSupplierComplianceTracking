@@ -9,8 +9,9 @@ from tkinter.ttk import Progressbar
 from tkinter import filedialog
 import os
 import pandas as pd
-# import tkdnd
-import tkinterDnD
+# tkdnd (Mac) / tkinterDnD (Windows)
+import tkdnd
+# import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 import DataCollection
@@ -141,7 +142,7 @@ class Interface_Creation:
 
         # Create a Button to submit the desired and inputted date.
         global button3
-        button3 = ttk.Button(self.root, text="Submit Date", width=10, command=input_date)
+        button3 = ttk.Button(self.root, text="Submit Date", width=12, command=input_date)
         button3.place(relx=.5, rely=.5, anchor=CENTER)
 
         # Display a label which prompts the user to enter a date.

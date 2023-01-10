@@ -8,14 +8,16 @@ from tkinter import ttk
 from tkinter import filedialog
 import os
 import pandas as pd
-# import tkdnd
-import tkinterDnD
+# tkdnd (Mac) / tkinterDnD (Windows)
+import tkdnd
+# import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 import InterfaceCreation
 
 
-interface = InterfaceCreation.Interface_Creation(tkinterDnD.Tk(), 800, 650)
+# interface = InterfaceCreation.Interface_Creation(tkinterDnD.Tk(), 800, 650) # Windows
+interface = InterfaceCreation.Interface_Creation(tkdnd.Tk(), 800, 650) # Mac
 interface.creation()
 # print(interface.store_list)
 

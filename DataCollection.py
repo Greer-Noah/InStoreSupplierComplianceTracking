@@ -10,8 +10,9 @@ import xlsxwriter
 from tkinter import filedialog
 import os
 import pandas as pd
-# import tkdnd
-import tkinterDnD
+# tkdnd (Mac) / tkinterDnD (Windows)
+import tkdnd
+# import tkinterDnD
 from pyepc import SGTIN
 from pyepc.exceptions import DecodingError
 from sqlalchemy import create_engine
