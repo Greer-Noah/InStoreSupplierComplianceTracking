@@ -263,17 +263,18 @@ class Data_Collection:
         print("Creating Matching Table...")
 
         stmt5 = "CREATE TABLE Matching AS " \
-                "SELECT " \
-                "MatchingWithApparel.gtin," \
-                "MatchingWithApparel.DEPT_CATG_GRP_DESC," \
-                "MatchingWithApparel.DEPT_CATEGORY_DESC," \
-                "MatchingWithApparel.VENDOR_NBR, " \
-                "MatchingWithApparel.VENDOR_NAME," \
-                "MatchingWithApparel.BRAND_FAMILY_NAME," \
-                "MatchingWithApparel.dept_nbr, " \
-                "MatchingWithApparel.REPL_GROUP_NBR " \
+                "SELECT DISTINCT MatchingWithApparel.gtin, " \
+                "MAX(MatchingWithApparel.DEPT_CATG_GRP_DESC) AS DEPT_CATG_GRP_DESC," \
+                "MAX(MatchingWithApparel.DEPT_CATEGORY_DESC) AS DEPT_CATEGORY_DESC," \
+                "MAX(MatchingWithApparel.VENDOR_NBR) AS VENDOR_NBR, " \
+                "MAX(MatchingWithApparel.VENDOR_NAME) AS VENDOR_NAME," \
+                "MAX(MatchingWithApparel.BRAND_FAMILY_NAME) AS BRAND_FAMILY_NAME," \
+                "MAX(MatchingWithApparel.REPL_GROUP_NBR) AS REPL_GROUP_NBR," \
+                "MAX(MatchingWithApparel.dept_nbr) AS dept_nbr " \
                 "FROM MatchingWithApparel " \
-                "WHERE gtin IN (SELECT UPCs FROM UPCDrop) AND dept_nbr IN ('7','9','14','17','20','22','71','72','74','87');"
+                "WHERE gtin IN (SELECT UPCs FROM UPCDrop) " \
+                "AND dept_nbr IN ('7','9','14','17','20','22','71','72','74','87') " \
+                "GROUP BY gtin;"
         cursor.execute(stmt5)
 
         # --------------Creates Total Items with Apparel Table--------------------------------------------------------------
@@ -303,7 +304,7 @@ class Data_Collection:
                 "ItemFile.VENDOR_NAME," \
                 "ItemFile.VENDOR_NBR " \
                 "FROM ItemFile " \
-                "INNER JOIN UPCDrop  ON UPCDrop.UPCs = ItemFile.gtin " \
+                "INNER JOIN UPCDrop ON UPCDrop.UPCs = ItemFile.gtin " \
                 "WHERE UPCDrop.UPCs = ItemFile.gtin;"
         cursor.execute(stmt7)
 
@@ -494,6 +495,7 @@ class Data_Collection:
 
         db_data = 'mysql+mysqldb://' + 'root' + ':' + 'password' + '@' + '127.0.0.1' + ':3306/' \
                   + 'reportsystem' + '?charset=latin1'
+
         engine = create_engine(db_data)
 
         connection = mysql.connector.connect(user='root', password='password', host='127.0.0.1', database='reportsystem',
@@ -519,6 +521,7 @@ class Data_Collection:
                 "MAX(dept_nbr) AS dept_nbr, " \
                 "MAX(REPL_GROUP_NBR) AS REPL_GROUP_NBR " \
                 "FROM CombinedMatching_Dupes GROUP BY gtin;"
+
         cursor.execute(stmt1)
 
         cursor.execute("DROP TABLE IF EXISTS CombinedMatching_Dupes;")

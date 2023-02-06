@@ -125,7 +125,7 @@ class Interface_Creation:
         quit_button.place(relx=.5, rely=.9, anchor=CENTER)
 
         global label
-        label = Label(self.root, text="Enter a store number (100, 355, 5625)", font=("Arial", 20, "bold"))
+        label = Label(self.root, text="Enter a store number (100, 355, 2087, 5625)", font=("Arial", 20, "bold"))
         label.place(relx=.5, rely=.2, anchor=CENTER)
         label.config(bg="#CCE1F2", fg="#000000")
 
